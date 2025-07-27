@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+./syncthing \
+  --no-browser \
+  --home "${PWD}/${SYNCTHING_HOME_DIR}" \
+  --gui-address "0.0.0.0:8080" \
+  --logflags=0 \
+  --no-default-folder \
+  --no-upgrade

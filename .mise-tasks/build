@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+curl \
+  --fail \
+  --silent \
+  --show-error \
+  --location \
+  --output syncthing.tar.gz \
+  "https://github.com/syncthing/syncthing/releases/download/v${SYNCTHING_VERSION}/syncthing-linux-amd64-v${SYNCTHING_VERSION}.tar.gz"
+
+tar -xzf syncthing.tar.gz "syncthing-linux-amd64-v${SYNCTHING_VERSION}/syncthing"
+
+mv "syncthing-linux-amd64-v${SYNCTHING_VERSION}/syncthing" .
+
+chmod +x syncthing
+
+./syncthing generate \
+  --home "${PWD}/${SYNCTHING_HOME_DIR}" \
+  --no-default-folder \
+  --skip-port-probing \
+  --gui-user "${SYNCTHING_GUI_USER}" \
+  --gui-password "${SYNCTHING_GUI_PASSWORD}"
+
+CONFIG_FILE="${PWD}/${SYNCTHING_HOME_DIR}/config.xml"
+
+sed -i 's#<announceLANAddresses>.*</announceLANAddresses>#<announceLANAddresses>false</announceLANAddresses>#' "${CONFIG_FILE}"
+sed -i 's#<localAnnounceEnabled>.*</localAnnounceEnabled>#<localAnnounceEnabled>false</localAnnounceEnabled>#' "${CONFIG_FILE}"
+sed -i 's#<natEnabled>.*</natEnabled>#<natEnabled>false</natEnabled>#' "${CONFIG_FILE}"
+sed -i 's#<listenAddress>.*</listenAddress>#<listenAddress>tcp://0.0.0.0:4040</listenAddress>#' "${CONFIG_FILE}"
